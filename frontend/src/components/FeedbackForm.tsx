@@ -1,11 +1,12 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const FeedbackForm = () => {
     const [text, setUserText] = useState("")
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<{ sentiment: string; confidence: number } | null>(null);
-    const handleSubmit = async () =>{
+    const handleSubmit = async (e?: React.FormEvent) =>{
+        if (e) e.preventDefault()
         setLoading(true)
         setResult(null)
 
@@ -38,23 +39,38 @@ const FeedbackForm = () => {
 
 
   return (
-    <div>
-      <input
-        className="mr-2 text-white border border-white rounded h-9 text-lg"
-        type="text"
-        value={text}
-        onChange={(e) => setUserText(e.target.value)}
-        placeholder="Type your feedback"
-        disabled={loading}
-      />
-      <button disabled={loading || text.trim() === ""} onClick={handleSubmit}>{loading ? "Analyzing..." : "Analyze"}</button>
+    <>
+      <form onSubmit={handleSubmit}>
+        <input
+          className="mr-2 text-white border border-white rounded h-9 text-lg"
+          type="text"
+          value={text}
+          onChange={(e) => setUserText(e.target.value)}
+          placeholder="Type your feedback"
+          disabled={loading}
+        />
+      </form>
+      <button type="submit" disabled={loading || text.trim() === ""}>
+        {loading ? "Analyzing..." : "Analyze"}
+      </button>
       {result && (
         <div>
-            <p>Sentiment: <strong className={result.sentiment == "negative" ? "text-red-600" : "text-blue-600"}>{result.sentiment}</strong></p>
-            <p>Confidence: {result.confidence.toFixed(2)}</p>
+          <p>
+            Sentiment:{" "}
+            <strong
+              className={
+                result.sentiment == "negative"
+                  ? "text-red-600"
+                  : "text-blue-600"
+              }
+            >
+              {result.sentiment}
+            </strong>
+          </p>
+          <p>Confidence: {result.confidence.toFixed(2)}</p>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
